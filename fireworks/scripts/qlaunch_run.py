@@ -48,10 +48,10 @@ def do_launch(args):
     if args.command == 'rapidfire':
         rapidfire(launchpad, fworker, queueadapter, args.launch_dir,
                   args.nlaunches, args.maxjobs_queue,
-                  args.maxjobs_block, args.sleep, args.reserve, args.loglvl)
+                  args.maxjobs_block, args.sleep, args.reserve, args.loglvl, job_dir=args.job_dir)
     else:
         launch_rocket_to_queue(launchpad, fworker, queueadapter,
-                               args.launch_dir, args.reserve, args.loglvl)
+                               args.launch_dir, args.reserve, args.loglvl, job_dir=args.job_dir)
 
 def qlaunch():
     m_description = 'This program is used to submit jobs to a queueing system. Details of the job and queue \
@@ -97,6 +97,8 @@ def qlaunch():
                         type=int,
                         default=0)
     parser.add_argument('--launch_dir', help='directory to launch the job / rapid-fire', default='.')
+    parser.add_argument('--job_dir', help='directory to launch enclosing batch jobs, default to the launch_dir',
+                        default=None)
     parser.add_argument('--logdir', help='path to a directory for logging', default=None)
     parser.add_argument('--loglvl', help='level to print log messages', default='INFO')
     parser.add_argument('-s', '--silencer', help='shortcut to mute log messages', action='store_true')

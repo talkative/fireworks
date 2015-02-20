@@ -30,7 +30,7 @@ __date__ = 'Dec 12, 2012'
 
 # TODO: clean up method signatures
 
-def launch_rocket_to_queue(launchpad, fworker, qadapter, launcher_dir='.', reserve=False, strm_lvl='INFO'):
+def launch_rocket_to_queue(launchpad, fworker, qadapter, launcher_dir='.', reserve=False, strm_lvl='INFO', job_dir='.'):
     """
     Submit a single job to the queue.
     
@@ -44,6 +44,7 @@ def launch_rocket_to_queue(launchpad, fworker, qadapter, launcher_dir='.', reser
 
     fworker = fworker if fworker else FWorker()
     launcher_dir = os.path.abspath(launcher_dir)
+    job_dir = os.path.abspath(job_dir) if job_dir else None
     l_logger = get_fw_logger('queue.launcher', l_dir=launchpad.logdir, stream_level=strm_lvl)
 
     l_logger.debug('getting queue adapter')
@@ -102,7 +103,8 @@ def launch_rocket_to_queue(launchpad, fworker, qadapter, launcher_dir='.', reser
 
                 l_logger.debug('writing queue script')
                 with open(SUBMIT_SCRIPT_NAME, 'w') as f:
-                    queue_script = qadapter.get_script_str(launcher_dir)
+                    batch_dir = job_dir if job_dir else launcher_dir
+                    queue_script = qadapter.get_script_str(batch_dir)
                     f.write(queue_script)
 
                 l_logger.info('submitting queue script')
@@ -129,7 +131,7 @@ def launch_rocket_to_queue(launchpad, fworker, qadapter, launcher_dir='.', reser
 
 
 def rapidfire(launchpad, fworker, qadapter, launch_dir='.', nlaunches=0, njobs_queue=10, njobs_block=500,
-              sleep_time=None, reserve=False, strm_lvl='INFO'):
+              sleep_time=None, reserve=False, strm_lvl='INFO', job_dir='.'):
     """
     Submit many jobs to the queue.
     
@@ -181,7 +183,8 @@ def rapidfire(launchpad, fworker, qadapter, launch_dir='.', nlaunches=0, njobs_q
                 # create launcher_dir
                 launcher_dir = create_datestamp_dir(block_dir, l_logger, prefix='launcher_')
                 # launch a single job
-                if not launch_rocket_to_queue(launchpad, fworker, qadapter, launcher_dir, reserve, strm_lvl):
+                if not launch_rocket_to_queue(launchpad, fworker, qadapter, launcher_dir, reserve, strm_lvl,
+                                              job_dir=job_dir):
                     raise RuntimeError("Launch unsuccessful!")
                 num_launched += 1
                 if num_launched == nlaunches:
