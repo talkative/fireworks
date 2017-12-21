@@ -841,6 +841,10 @@ class LaunchPad(FWSerializable):
         """
         m_query = dict(query) if query else {}  # make a defensive copy
         m_query['state'] = 'READY'
+
+        if 'spec._category' in m_query:
+            m_query['spec._category'] = eval(m_query['spec._category'])
+
         sortby = [("spec._priority", DESCENDING)]
 
         if SORT_FWS.upper() == "FIFO":
