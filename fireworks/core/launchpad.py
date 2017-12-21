@@ -843,7 +843,8 @@ class LaunchPad(FWSerializable):
         m_query['state'] = 'READY'
 
         if 'spec._category' in m_query:
-            m_query['spec._category'] = eval(m_query['spec._category'])
+            if m_query['spec._category'][0] == "{": # if this is a sub-query
+                m_query['spec._category'] = eval(m_query['spec._category'])
 
         sortby = [("spec._priority", DESCENDING)]
 
